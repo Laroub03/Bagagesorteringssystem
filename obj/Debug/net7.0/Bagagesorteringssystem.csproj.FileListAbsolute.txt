@@ -1,0 +1,15 @@
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/bin/Debug/net7.0/Bagagesorteringssystem
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/bin/Debug/net7.0/Bagagesorteringssystem.deps.json
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/bin/Debug/net7.0/Bagagesorteringssystem.runtimeconfig.json
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/bin/Debug/net7.0/Bagagesorteringssystem.dll
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/bin/Debug/net7.0/Bagagesorteringssystem.pdb
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/obj/Debug/net7.0/Bagagesorteringssystem.csproj.AssemblyReference.cache
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/obj/Debug/net7.0/Bagagesorteringssystem.GeneratedMSBuildEditorConfig.editorconfig
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/obj/Debug/net7.0/Bagagesorteringssystem.AssemblyInfoInputs.cache
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/obj/Debug/net7.0/Bagagesorteringssystem.AssemblyInfo.cs
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/obj/Debug/net7.0/Bagagesorteringssystem.csproj.CoreCompileInputs.cache
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/obj/Debug/net7.0/Bagagesorteringssystem.dll
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/obj/Debug/net7.0/refint/Bagagesorteringssystem.dll
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/obj/Debug/net7.0/Bagagesorteringssystem.pdb
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/obj/Debug/net7.0/Bagagesorteringssystem.genruntimeconfig.cache
+/Users/ayoublaroub/projects/Bagagesorteringssystem/Bagagesorteringssystem/obj/Debug/net7.0/ref/Bagagesorteringssystem.dll
