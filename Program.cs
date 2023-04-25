@@ -8,10 +8,10 @@ namespace MainClass
 {
     public class BaggageSortingSystem
     {
-        // Maximum buffer size
-        static int _maxBufferSize = 10;
+        // Maximum buffer size for sorting
+        private const int _maxBufferSize = 10;
 
-        // Data structures for the different components
+        // Data structures for the different components: check-in queue, sorting buffer, and gates
         static Queue<Passenger> _checkInQueue = new Queue<Passenger>();
         static Queue<Baggage> _sortingBuffer = new Queue<Baggage>();
         static Dictionary<string, Queue<Baggage>> _gates = new Dictionary<string, Queue<Baggage>>();
@@ -28,7 +28,6 @@ namespace MainClass
             Thread checkInThread = new Thread(new ThreadStart(baggageSortingSystem.CheckIn));
             Thread sortingThread = new Thread(new ThreadStart(baggageSortingSystem.Sorting));
             Thread gateLoadingThread = new Thread(new ThreadStart(baggageSortingSystem.GateLoading));
-
             checkInThread.Start();
             sortingThread.Start();
             gateLoadingThread.Start();
@@ -38,19 +37,20 @@ namespace MainClass
             gateLoadingThread.Join();
         }
 
-        // Implement the CheckIn, Sorting, and GateLoading methods
+        // CheckIn method handles passenger check-in process
         public void CheckIn()
         {
             int passengerCounter = 1;
-
             while (true)
             {
-                // Produce 10 passengers
+                // Produce 10 passengers in each iteration
                 for (int i = 0; i < 10; i++)
                 {
-                    Monitor.Enter(_checkInQueue);
                     try
                     {
+                        lock(_checkInQueue)
+                        {
+                        // Create and enqueue a new passenger
                         Passenger passenger = new Passenger
                         {
                             Name = $"Passenger{passengerCounter}",
@@ -60,25 +60,30 @@ namespace MainClass
                         _checkInQueue.Enqueue(passenger);
                         Console.WriteLine($"Checked in: {passenger.Name}, {passenger.FlightNumber}, {passenger.BaggageNumber}");
                         passengerCounter++;
+                        }
                     }
-                    finally
+                    catch (Exception e)
                     {
-                        Monitor.Exit(_checkInQueue);
+                        // handle any errors that occur
+                        Console.WriteLine("Error caught.", e);
                     }
                 }
 
-                // Wait for sorting and gate loading to finish
+                // Wait for sorting and gate loading processes to finish before generating more passengers
                 while (true)
                 {
-                    Monitor.Enter(_checkInQueue);
                     bool checkInEmpty = false;
                     try
                     {
-                        checkInEmpty = _checkInQueue.Count == 0;
+                        lock (_checkInQueue)
+                        {
+                            checkInEmpty = _checkInQueue.Count == 0;
+                        }
                     }
-                    finally
+                    catch (Exception e)
                     {
-                        Monitor.Exit(_checkInQueue);
+                        // handle any errors that occur
+                        Console.WriteLine("Error caught.", e);
                     }
 
                     if (checkInEmpty)
@@ -86,105 +91,119 @@ namespace MainClass
                         break;
                     }
 
-                    Thread.Sleep(1000); // Wait for a second before checking again
+                    Thread.Sleep(1000);
                 }
             }
         }
 
-
+        // Sorting method handles the baggage sorting process
         public void Sorting()
         {
             while (true)
             {
-                Monitor.Enter(_checkInQueue);
+
                 Baggage baggage = null;
 
+                // Dequeue the next passenger's baggage from the check-in queue
                 try
                 {
-                    if (_checkInQueue.Count > 0)
+                   lock(_checkInQueue)
                     {
-                        Passenger passenger = _checkInQueue.Dequeue();
-                        baggage = new Baggage
+                        if (_checkInQueue.Count > 0)
                         {
-                            BaggageNumber = passenger.BaggageNumber,
-                            FlightNumber = passenger.FlightNumber
-                        };
+                            Passenger passenger = _checkInQueue.Dequeue();
+                            baggage = new Baggage
+                            {
+                                BaggageNumber = passenger.BaggageNumber,
+                                FlightNumber = passenger.FlightNumber
+                            };
+                        }
                     }
                 }
-                finally
+                catch (Exception e)
                 {
-                    Monitor.Exit(_checkInQueue);
+                    // handle any errors that occur
+                    Console.WriteLine("Error caught.", e);
                 }
+
 
                 if (baggage != null)
                 {
-                    Monitor.Enter(_sortingBuffer);
-
                     try
                     {
-                        while (_sortingBuffer.Count == _maxBufferSize)
+                        lock (_sortingBuffer)
                         {
-                            Monitor.Wait(_sortingBuffer);
-                        }
+                            // Wait if the sorting buffer is full
+                            while (_sortingBuffer.Count == _maxBufferSize)
+                            {
+                                Monitor.Wait(_sortingBuffer);
+                            }
 
-                        _sortingBuffer.Enqueue(baggage);
-                        Console.WriteLine($"Sorting: {baggage.BaggageNumber} for {baggage.FlightNumber}");
+                            // Enqueue the baggage into the sorting buffer
+                            _sortingBuffer.Enqueue(baggage);
+                            Console.WriteLine($"Sorting: {baggage.BaggageNumber} for {baggage.FlightNumber}");
 
-                        if (_sortingBuffer.Count > 0)
-                        {
-                            Monitor.PulseAll(_sortingBuffer);
+                            // Notify other threads if there is baggage in the sorting buffer
+                            if (_sortingBuffer.Count > 0)
+                            {
+                                Monitor.PulseAll(_sortingBuffer);
+                            }
                         }
                     }
-                    finally
+                    catch (Exception e)
                     {
-                        Monitor.Exit(_sortingBuffer);
+                        // handle any errors that occur
+                        Console.WriteLine("Error caught.", e);
                     }
                 }
-
-                //Random rnd = new Random();
-                //int number = rnd.Next(1, 2000);
                 Thread.Sleep(1000);
             }
         }
 
+        // GateLoading method handles the baggage loading process at the gates
         public void GateLoading()
         {
             while (true)
             {
-                Monitor.Enter(_sortingBuffer);
                 Baggage baggage = null;
-
+                // Dequeue the next baggage from the sorting buffer
                 try
                 {
-                    if (_sortingBuffer.Count > 0)
+                    lock(_sortingBuffer)
                     {
-                        baggage = _sortingBuffer.Dequeue();
+                        if (_sortingBuffer.Count > 0)
+                        {
+                            baggage = _sortingBuffer.Dequeue();
+                        }
                     }
                 }
-                finally
+                catch (Exception e)
                 {
-                    Monitor.Exit(_sortingBuffer);
+                    // handle any errors that occur
+                    Console.WriteLine("Error caught.", e);
                 }
 
                 if (baggage != null)
                 {
+                    // Determine the gate based on the flight number
                     string gateName = (baggage.FlightNumber == "Flight1") ? "Gate1" : "Gate2";
-                    Monitor.Enter(_gates[gateName]);
 
                     try
                     {
+                        lock (_gates[gateName])
+                        {
+                        // Enqueue the baggage into the appropriate gate
                         _gates[gateName].Enqueue(baggage);
                         Console.WriteLine($"Loaded {baggage.BaggageNumber} to {gateName}");
                         Monitor.PulseAll(_gates[gateName]);
+                        }
                     }
-                    finally
+                    catch (Exception e)
                     {
-                        Monitor.Exit(_gates[gateName]);
+                        // handle any errors that occur
+                        Console.WriteLine("Error caught.", e);
                     }
                 }
-
-                //Random rnd = new Random();
-                //int number = rnd.Next(1, 2000);
                 Thread.Sleep(1000);
             }
         }
