@@ -59,14 +59,12 @@ namespace MainClass
                     passengerThread.Join();
                 }
 
-                // Start the sorting and loading threads inside the while loop
                 Thread sortingThread = new Thread(new ThreadStart(baggageSortingSystem.Sorting));
                 Thread gateLoadingThread = new Thread(new ThreadStart(baggageSortingSystem.GateLoading));
 
                 sortingThread.Start();
                 gateLoadingThread.Start();
 
-                // Add a barrier to wait for sorting and loading to finish before moving to the next batch of passengers
                 sortingThread.Join();
                 gateLoadingThread.Join();
             }
